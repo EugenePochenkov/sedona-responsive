@@ -1,0 +1,23 @@
+.button-toggle {
+  display: block;
+  width: 23px;
+  height: 21px;
+  border: none;
+
+  background-color: @gray--lightest;
+  background-image: url("../img/burger.svg");
+  background-repeat: no-repeat;
+
+  &:focus {
+    outline: none;
+  }
+
+  &--opened {
+    background-color: @color-main;
+    background-image: url("../img/cross.svg");
+  }
+
+  @media (min-width: @screen-tablet) {
+    display: none;
+  }
+}

@@ -1,0 +1,56 @@
+.button {
+  display: block;
+  min-width: 280px;
+  padding: 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border: none;
+
+  font-size: @font-size-heading;
+  font-weight: 700;
+  line-height: @line-height-heading;
+  font-family: @font-family;
+  color: @gray--lightest;
+  text-align: center;
+
+  background-color: @color-main;
+
+  cursor: pointer;
+
+  @media (min-width: @screen-tablet) {
+    width: 460px;
+    margin: 0 auto;
+  }
+
+  &:hover {
+    background-color: @color-main--hover;
+
+    box-shadow: 0 0 0 3px @gray--lightest, 0 0 0 5px @color-main;
+  }
+
+  &:visited {
+    background-color: @color-main--visited;
+
+    opacity: 0.3;
+  }
+
+  &:focus {
+    background-color: @color-main--hover;
+
+    box-shadow: 0 0 0 3px @gray--lightest, 0 0 0 5px @color-main;
+
+    outline: none;
+  }
+
+  &--submit {
+    margin: 0 auto;
+
+    @media (min-width: @screen-tablet) {
+      width: 325px;
+    }
+
+    @media (min-width: @screen-desktop) {
+      width: 480px;
+    }
+  }
+}

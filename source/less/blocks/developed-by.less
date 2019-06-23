@@ -1,0 +1,37 @@
+.developed-by {
+  position: relative;
+
+  width: 155px;
+  padding-left: 10px;
+  padding-right: 45px;
+
+  font-size: @font-size-regular;
+  font-weight: 400;
+  line-height: @line-height-heading;
+  font-family: @font-family;
+  color: @gray--darkest;
+}
+
+.developed-by__link {
+  &:focus {
+    fill: @color-main;
+
+    outline: none;
+  }
+}
+
+.developed-by__icon {
+  position: absolute;
+  top: 50%;
+  left: 100px;
+
+  transform: translateY(-50%);
+
+  &:hover {
+    fill: @color-main;
+  }
+
+  &:visited {
+    fill-opacity: 0.3;
+  }
+}

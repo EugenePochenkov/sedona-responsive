@@ -1,0 +1,127 @@
+.nav-list {
+  display: block;
+
+  @media (min-width: @screen-tablet) {
+    position: relative;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    background-color: @gray--lightest;
+  }
+}
+
+.nav-list__item {
+  display: block;
+  min-height: 56px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+
+  text-align: center;
+
+  background-color: @color-main;
+
+  box-shadow: 0 -1px 0 0 rgba(1, 1, 1, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+
+  @media (min-width: @screen-tablet) {
+    .content-centering();
+
+    flex-basis: 20%;
+    padding: 0;
+
+    background-color: @gray--lightest;
+
+    box-shadow: none;
+
+    &:nth-child(2) {
+      margin-right: 20%;
+    }
+  }
+
+  &--initial-opened {
+    position: relative;
+
+    height: 56px;
+    padding: 0;
+
+    background-color: @gray--lightest;
+
+    box-shadow: 0 -2px 15px rgba(1, 1, 1, 0.2);
+
+    @media (min-width: @screen-tablet) {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      z-index: 20;
+
+      width: 155px;
+
+      box-shadow: none;
+
+      transform: translateX(-50%);
+    }
+
+    @media (min-width: @screen-desktop) {
+      width: 240px;
+    }
+  }
+}
+
+.nav-list__link {
+  font-style: normal;
+  font-size: @font-size-regular--larger;
+  font-weight: 700;
+  line-height: @line-height-regular--largest;
+  font-family: @font-family;
+  color: @gray--lightest;
+
+  @media (min-width: @screen-tablet) {
+    font-size: @font-size-regular;
+    line-height: @line-height-heading;
+    color: @gray--darkest;
+
+    &:hover {
+      color: @color-main;
+    }
+
+    &:visited {
+      opacity: 0.3;
+    }
+
+    &:focus {
+      color: @color-main;
+
+      outline: none;
+    }
+
+    &:active {
+      color: @color-menu-active;
+
+      &:hover {
+        color: @color-menu-active--hover;
+      }
+
+      &:visited {
+        opacity: 0.3;
+      }
+    }
+  }
+}
+
+.nav-list__wrapper-for-logo {
+  @media (min-width: @screen-tablet) {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.nav-list__logo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 10;
+
+  transform: translateX(-50%);
+}

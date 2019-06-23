@@ -1,0 +1,46 @@
+.social-links {
+  display: flex;
+  justify-content: space-between;
+  width: 150px;
+  margin: 0 auto;
+}
+
+.social-links__item {
+  .content-centering ();
+
+  display: flex;
+  width: 45px;
+  height: 48px;
+
+  font-size: 0;
+
+  background-color: @color-main;
+
+  &:hover {
+    background-color: @color-main--hover;
+
+    .social-links__icon {
+      fill-opacity: 0.3;
+    }
+  }
+
+  &:visited {
+    background-color: @color-main--visited;
+
+    .social-links__icon {
+      fill-opacity: 0.3;
+    }
+  }
+
+  &:focus {
+    outline: none;
+
+    .social-links__icon {
+      fill-opacity: 0.3;
+    }
+  }
+}
+
+.social-links__icon {
+  fill: @gray--lightest;
+}
