@@ -123,7 +123,7 @@ function deploy() {
     .pipe(ghPages());
 }
 
-exports.default = series(
+exports.build = series(
   clean,
   parallel(
     copy,
