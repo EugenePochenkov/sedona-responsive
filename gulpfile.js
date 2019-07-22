@@ -1,4 +1,6 @@
-const gulp = require('gulp');
+const {
+  src, dest, parallel, series, watch,
+} = require('gulp');
 const del = require('del');
 const rename = require('gulp-rename');
 const less = require('gulp-less');
@@ -14,104 +16,129 @@ const posthtml = require('gulp-posthtml');
 const include = require('posthtml-include');
 const babel = require('gulp-babel');
 const uglify = require('gulp-uglify');
-const pipeline = require('readable-stream');
 const ghPages = require('gulp-gh-pages');
 const server = require('browser-sync').create();
 
+function clean() {
+  return del('build');
+}
 
-gulp.task('clean', () => del('build'));
+function copy() {
+  return src([
+    'source/fonts/**/*.{woff,woff2}',
+    'source/js/modernizr-custom.js',
+  ], {
+    base: 'source',
+  })
+    .pipe(dest('build'));
+}
 
+function images() {
+  return src('source/img/**/*.{png,jpg,svg}')
+    .pipe(imagemin([
+      imagemin.jpegtran({
+        progressive: true,
+      }),
+      imagemin.optipng({
+        optimizationLevel: 3,
+      }),
+      imagemin.svgo(),
+    ]))
+    .pipe(dest('build/img'));
+}
 
-gulp.task('copy', () => gulp.src([
-  'source/fonts/**/*.{woff,woff2}',
-  'source/js/**/*.js',
-], {
-  base: 'source',
-})
-  .pipe(gulp.dest('build')));
+function webpConvert() {
+  return src('source/img/**/*.{png,jpg}')
+    .pipe(webp({
+      quality: 80,
+    }))
+    .pipe(dest('build/img'));
+}
 
+function compressJs() {
+  return src('source/js/app.js')
+    .pipe(babel({
+      presets: ['@babel/env'],
+    }))
+    .pipe(uglify())
+    .pipe(dest('build/js'))
+    .on('end', server.reload);
+}
 
-gulp.task('images', () => gulp.src('source/img/**/*.{png,jpg,svg}')
-  .pipe(imagemin([
-    imagemin.jpegtran({
-      progressive: true,
-    }),
-    imagemin.optipng({
-      optimizationLevel: 3,
-    }),
-    imagemin.svgo(),
-  ]))
-  .pipe(gulp.dest('build/img')));
+function sprite() {
+  return src('build/img/icons/*.svg')
+    .pipe(svgstore({
+      inlineSvg: true,
+    }))
+    .pipe(rename('sprite.svg'))
+    .pipe(dest('build/img'));
+}
 
+function cleanSvgWhichInSprite() {
+  return del('build/img/icons');
+}
 
-gulp.task('webp', () => gulp.src('source/img/**/*.{png,jpg}')
-  .pipe(webp({
-    quality: 80,
-  }))
-  .pipe(gulp.dest('build/img')));
+function html() {
+  return src('source/*.html')
+    .pipe(posthtml([
+      include(),
+    ]))
+    .pipe(htmlmin({
+      collapseWhitespace: true,
+    }))
+    .pipe(dest('build'))
+    .on('end', server.reload);
+}
 
+function style() {
+  return src('source/less/style.less')
+    .pipe(plumber())
+    .pipe(less())
+    .pipe(postcss([
+      autoprefixer(),
+      cssnano(),
+    ]))
+    .pipe(dest('build/css'))
+    .pipe(server.reload({
+      stream: true,
+    }));
+}
 
-gulp.task('compress', done => pipeline(
-  gulp.src('build/js/*.js'),
-  babel(),
-  uglify(),
-  gulp.dest('build/js').on('end', server.reload),
-  done(),
-));
+function serve() {
+  return server.init({
+    server: {
+      baseDir: 'build',
+    },
+  });
+}
 
+function watchFiles() {
+  watch('source/less/**/*.less', style);
+  watch('source/**/*.html', html);
+  watch('source/js/**/*.js', compressJs);
+}
 
-gulp.task('sprite', () => gulp.src('build/img/icons/*.svg')
-  .pipe(svgstore({
-    inlineSvg: true,
-  }))
-  .pipe(rename('sprite.svg'))
-  .pipe(gulp.dest('build/img')));
+function deploy() {
+  return src('./build/**/*')
+    .pipe(ghPages());
+}
 
+exports.default = series(
+  clean,
+  parallel(
+    copy,
+    images,
+    webpConvert,
+    compressJs,
+  ),
+  sprite,
+  cleanSvgWhichInSprite,
+  html,
+  style,
+  parallel(
+    watchFiles,
+    serve,
+  ),
+);
 
-gulp.task('cleanSvgWhichInSprite', () => del('build/img/icons'));
-
-
-gulp.task('html', () => gulp.src('source/*.html')
-  .pipe(posthtml([
-    include(),
-  ]))
-  .pipe(htmlmin({
-    collapseWhitespace: true,
-  }))
-  .pipe(gulp.dest('build'))
-  .on('end', server.reload));
-
-
-gulp.task('style', () => gulp.src('source/less/style.less')
-  .pipe(plumber())
-  .pipe(less())
-  .pipe(postcss([
-    autoprefixer(),
-    cssnano(),
-  ]))
-  .pipe(gulp.dest('build/css'))
-  .pipe(server.reload({
-    stream: true,
-  })));
-
-
-gulp.task('serve', () => server.init({
-  server: {
-    baseDir: 'build',
-  },
-}));
-
-
-gulp.task('watch', () => {
-  gulp.watch('source/less/**/*.less', gulp.series('style'));
-  gulp.watch('source/**/*.html', gulp.series('html'));
-  gulp.watch('source/js/**/*.js', gulp.series('compress'));
-});
-
-
-gulp.task('default', gulp.series('clean',
-  gulp.parallel('copy', 'images', 'webp', 'compress'), 'sprite', 'cleanSvgWhichInSprite', 'html', 'style', gulp.parallel('watch', 'serve')));
-
-
-gulp.task('deploy', () => gulp.src('./build/**/*')
-  .pipe(ghPages()));
+exports.deploy = deploy;
